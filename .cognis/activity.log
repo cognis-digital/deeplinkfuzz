@@ -1,3 +1,4 @@
 2024-06-15T14:46:26  test(detect): normalize unicode before matching
 2024-07-05T09:03:33  build(rules): document the config keys
 2024-07-08T16:20:40  chore(config): lower memory on big inputs
+2024-07-29T11:37:47  perf(detect): add color + severity icons
