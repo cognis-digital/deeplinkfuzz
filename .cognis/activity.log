@@ -3,3 +3,4 @@
 2024-07-08T16:20:40  chore(config): lower memory on big inputs
 2024-07-29T11:37:47  perf(detect): add color + severity icons
 2024-08-19T18:54:54  ci(rules): fix off-by-one in line numbers
+2024-09-09T13:11:01  feat(config): normalize unicode before matching
