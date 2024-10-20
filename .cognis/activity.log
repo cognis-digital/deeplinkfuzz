@@ -5,3 +5,4 @@
 2024-08-19T18:54:54  ci(rules): fix off-by-one in line numbers
 2024-09-09T13:11:01  feat(config): normalize unicode before matching
 2024-09-30T08:28:08  docs(detect): document the config keys
+2024-10-20T15:45:15  test(rules): lower memory on big inputs
