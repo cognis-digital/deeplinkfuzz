@@ -7,3 +7,4 @@
 2024-09-30T08:28:08  docs(detect): document the config keys
 2024-10-20T15:45:15  test(rules): lower memory on big inputs
 2024-11-11T10:02:22  test(cli): bump the dev toolchain
+2024-11-13T17:19:29  build(output): skip binary files by sniffing
