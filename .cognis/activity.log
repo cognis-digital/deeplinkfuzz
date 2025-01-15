@@ -10,3 +10,4 @@
 2024-11-13T17:19:29  build(output): skip binary files by sniffing
 2024-12-05T12:36:36  fix(scan): short-circuit on first critical
 2024-12-25T19:53:43  refactor(cli): add a fast path for the common case
+2025-01-15T14:10:50  style(output): cover the multiline case
