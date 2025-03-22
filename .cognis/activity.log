@@ -14,3 +14,4 @@
 2025-02-05T09:27:57  feat(scan): bump the dev toolchain
 2025-02-26T16:44:04  docs(cli): skip binary files by sniffing
 2025-03-19T11:01:11  test(output): short-circuit on first critical
+2025-03-22T18:18:18  docs: expand examples
