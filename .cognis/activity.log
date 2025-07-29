@@ -21,3 +21,4 @@
 2025-06-14T10:26:46  perf: speed. I am speed.
 2025-07-05T17:43:53  style: formatting (we chose violence on tabs vs spaces)
 2025-07-25T12:00:00  chore: one does not simply skip CI
+2025-07-29T19:17:07  chore(io): add a --format json alias
