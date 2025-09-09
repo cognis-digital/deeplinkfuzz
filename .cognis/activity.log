@@ -23,3 +23,4 @@
 2025-07-25T12:00:00  chore: one does not simply skip CI
 2025-07-29T19:17:07  chore(io): add a --format json alias
 2025-08-18T14:34:14  perf(docs): guard against ReDoS in patterns
+2025-09-09T09:51:21  ci(fixtures): handle CRLF line endings
