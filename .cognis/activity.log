@@ -25,3 +25,4 @@
 2025-08-18T14:34:14  perf(docs): guard against ReDoS in patterns
 2025-09-09T09:51:21  ci(fixtures): handle CRLF line endings
 2025-09-29T16:08:28  fix(io): improve error messages with context
+2025-10-20T11:25:35  docs(docs): add usage examples to help
