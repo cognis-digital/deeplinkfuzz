@@ -28,3 +28,4 @@
 2025-10-20T11:25:35  docs(docs): add usage examples to help
 2025-11-10T18:42:42  test(fixtures): add a --format json alias
 2025-12-01T13:59:49  build(io): guard against ReDoS in patterns
+2025-12-22T08:16:56  chore(docs): handle CRLF line endings
