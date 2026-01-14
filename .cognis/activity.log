@@ -30,3 +30,4 @@
 2025-12-01T13:59:49  build(io): guard against ReDoS in patterns
 2025-12-22T08:16:56  chore(docs): handle CRLF line endings
 2025-12-25T15:33:03  chore(deps): add a dry-run flag
+2026-01-14T10:50:10  refactor(cache): reduce false positives on edge cases
