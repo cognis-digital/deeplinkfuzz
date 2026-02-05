@@ -31,3 +31,4 @@
 2025-12-22T08:16:56  chore(docs): handle CRLF line endings
 2025-12-25T15:33:03  chore(deps): add a dry-run flag
 2026-01-14T10:50:10  refactor(cache): reduce false positives on edge cases
+2026-02-05T17:07:17  style(engine): assert exit codes in tests
