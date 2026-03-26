@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example">
+    <application android:label="DemoApp">
+
+        <activity android:name="com.example.DeepLinkActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="myapp" android:host="open"
+                      android:pathPrefix="/profile" />
+                <data android:scheme="https" android:host="example.com"
+                      android:pathPrefix="/item" />
+            </intent-filter>
+        </activity>
+
+        <service android:name="com.example.SearchService"
+            android:exported="true"
+            android:permission="com.example.permission.SEARCH">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <data android:scheme="myapp" android:host="search"
+                      android:path="/query" />
+            </intent-filter>
+        </service>
+
+        <activity android:name="com.example.InternalActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="myapp" android:host="internal"
+                      android:path="/admin" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
