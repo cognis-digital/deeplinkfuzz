@@ -34,3 +34,4 @@
 2026-02-05T17:07:17  style(engine): assert exit codes in tests
 2026-02-26T12:24:24  feat(deps): pin the test dependencies
 2026-03-19T19:41:31  docs(cache): add a JSON schema for output
+2026-04-09T14:58:38  test(engine): add a dry-run flag
