@@ -36,3 +36,4 @@
 2026-03-19T19:41:31  docs(cache): add a JSON schema for output
 2026-04-09T14:58:38  test(engine): add a dry-run flag
 2026-04-29T09:15:45  build(deps): reduce false positives on edge cases
+2026-05-03T16:32:52  chore(cache): assert exit codes in tests
