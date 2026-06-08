@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/deeplinkfuzz",
+  "version": "0.2.0",
+  "description": "JavaScript port of deeplinkfuzz (Cognis Neural Suite)",
+  "bin": {
+    "deeplinkfuzz": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}
