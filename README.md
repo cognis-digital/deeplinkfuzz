@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-deeplinkfuzz
+pip install "git+https://github.com/cognis-digital/deeplinkfuzz.git"
 deeplinkfuzz scan .            # → prioritized findings in seconds
 ```
 
@@ -51,7 +51,7 @@ Deep-link/intent vulns are a top mobile bug-bounty payout class with no dedicate
 ## Quick start
 
 ```bash
-pip install cognis-deeplinkfuzz
+pip install "git+https://github.com/cognis-digital/deeplinkfuzz.git"
 deeplinkfuzz --version
 deeplinkfuzz scan .                       # scan current project
 deeplinkfuzz scan . --format json         # machine-readable
