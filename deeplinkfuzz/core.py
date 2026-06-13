@@ -37,10 +37,33 @@ class EntryPoint:
     paths: List[str] = field(default_factory=list)
     actions: List[str] = field(default_factory=list)
     permission: Optional[str] = None
+    # Ordered list of (scheme, host, path) tuples — one per <data> element.
+    # When populated, deep_links() uses these directly instead of the
+    # cross-product of schemes x hosts x paths.
+    data_templates: List[tuple] = field(default_factory=list)
 
     def deep_links(self) -> List[str]:
-        """Concrete scheme://host/path templates this component answers to."""
+        """Concrete scheme://host/path templates this component answers to.
+
+        Each <data> element in the manifest defines one URI template
+        (scheme://host/path).  When data_templates is populated (the normal
+        path), return exactly those links.  Otherwise fall back to the
+        cross-product of schemes x hosts x paths for backward compatibility.
+        """
         links: List[str] = []
+        if self.data_templates:
+            seen: set = set()
+            for scheme, host, path in self.data_templates:
+                if not scheme:
+                    continue
+                h = host or "app"
+                p = path if path.startswith("/") else "/" + path if path else "/"
+                link = f"{scheme}://{h}{p}"
+                if link not in seen:
+                    seen.add(link)
+                    links.append(link)
+            return links
+        # Legacy fallback: cross-product (used when data_templates is empty)
         schemes = self.schemes or ([] if self.hosts or self.paths else [])
         hosts = self.hosts or [""]
         paths = self.paths or ["/"]
@@ -151,20 +174,33 @@ def enumerate_entry_points(text: str, include_unexported: bool = False) -> List[
         hosts: List[str] = []
         paths: List[str] = []
         actions: List[str] = []
+        data_templates: List[tuple] = []
         for f in filters:
             for child in f:
                 ctag = child.tag.split("}")[-1]
                 if ctag == "data":
                     s = _attr(child, "scheme")
                     h = _attr(child, "host")
+                    # Find the first path-like attribute for this data element.
+                    pv = None
                     for pa in ("path", "pathPrefix", "pathPattern"):
                         pv = _attr(child, pa)
-                        if pv and pv not in paths:
-                            paths.append(pv)
+                        if pv:
+                            break
+                    # Record as a complete URI template when scheme is present.
+                    if s:
+                        tpl = (s, h or "", pv or "/")
+                        if tpl not in data_templates:
+                            data_templates.append(tpl)
+                    # Also maintain legacy flat lists for serialisation compat.
                     if s and s not in schemes:
                         schemes.append(s)
                     if h and h not in hosts:
                         hosts.append(h)
+                    for pa in ("path", "pathPrefix", "pathPattern"):
+                        pv2 = _attr(child, pa)
+                        if pv2 and pv2 not in paths:
+                            paths.append(pv2)
                 elif ctag == "action":
                     a = _attr(child, "name")
                     if a and a not in actions:
@@ -178,6 +214,7 @@ def enumerate_entry_points(text: str, include_unexported: bool = False) -> List[
             paths=paths,
             actions=actions,
             permission=_attr(elem, "permission"),
+            data_templates=data_templates,
         ))
     return results
 
