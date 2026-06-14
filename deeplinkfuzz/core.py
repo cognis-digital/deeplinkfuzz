@@ -115,7 +115,9 @@ PAYLOADS: Dict[str, tuple] = {
     "xss_img": ("<img src=x onerror=alert(1)>", "xss", "medium"),
     "cmd_inject": ("; cat /etc/passwd", "command_injection", "critical"),
     "cmd_backtick": ("`id`", "command_injection", "critical"),
-    "intent_redirect": ("intent://evil/#Intent;scheme=app;end", "intent_redirection", "high"),
+    "intent_redirect": (
+        "intent://evil/#Intent;scheme=app;end", "intent_redirection", "high"
+    ),
     "format_str": ("%n%n%n%s%s", "format_string", "medium"),
     "overflow": ("A" * 4096, "buffer_overflow", "low"),
     "null_byte": ("file.txt%00.png", "null_byte_injection", "medium"),
@@ -137,14 +139,21 @@ def _truthy(val: Optional[str]) -> bool:
 
 
 def parse_manifest(text: str) -> ET.Element:
-    """Parse manifest XML text and return the root element."""
+    """Parse manifest XML text and return the root element.
+
+    Raises ValueError for empty input or malformed XML.
+    """
+    if not text or not text.strip():
+        raise ValueError("manifest text is empty")
     try:
         return ET.fromstring(text)
-    except ET.ParseError as exc:  # pragma: no cover - error path
+    except ET.ParseError as exc:
         raise ValueError(f"invalid manifest XML: {exc}") from exc
 
 
-def enumerate_entry_points(text: str, include_unexported: bool = False) -> List[EntryPoint]:
+def enumerate_entry_points(
+    text: str, include_unexported: bool = False
+) -> List[EntryPoint]:
     """Enumerate exported components with intent-filters from a manifest.
 
     A component is treated as exported when android:exported=\"true\", or when
@@ -262,7 +271,9 @@ def mutate(entry: EntryPoint) -> List[FuzzCase]:
 # Detection. Deterministic model of how a vulnerable handler would react.
 # ---------------------------------------------------------------------------
 _DETECTORS = [
-    ("sql_injection", re.compile(r"('\s*OR\s*'?1'?='?1|UNION\s+SELECT|DROP\s+TABLE|;\s*DROP)", re.I)),
+    ("sql_injection", re.compile(
+        r"('\s*OR\s*'?1'?='?1|UNION\s+SELECT|DROP\s+TABLE|;\s*DROP)", re.I
+    )),
     ("command_injection", re.compile(r"(;\s*cat\s|`[^`]+`|\|\s*sh\b|&&\s*\w)", re.I)),
     ("path_traversal", re.compile(r"(\.\./|\.\.%2f|/etc/passwd)", re.I)),
     ("intent_redirection", re.compile(r"intent://", re.I)),
@@ -273,7 +284,9 @@ _DETECTORS = [
 ]
 
 
-def detect_vulnerabilities(entry: EntryPoint, cases: Iterable[FuzzCase]) -> List[Finding]:
+def detect_vulnerabilities(
+    entry: EntryPoint, cases: Iterable[FuzzCase]
+) -> List[Finding]:
     """Replay fuzz cases and emit findings.
 
     The replay decodes the URL and applies detector signatures. A component
@@ -299,7 +312,10 @@ def detect_vulnerabilities(entry: EntryPoint, cases: Iterable[FuzzCase]) -> List
             evidence = (
                 f"exported {entry.kind} reflects {category} marker "
                 f"'{m.group(0).strip()}' via {case.target}"
-                + (f" (guarded by {entry.permission})" if guarded else " (no permission guard)")
+                + (
+                    f" (guarded by {entry.permission})"
+                    if guarded else " (no permission guard)"
+                )
             )
             findings.append(Finding(
                 component=entry.component,
@@ -317,8 +333,16 @@ def detect_vulnerabilities(entry: EntryPoint, cases: Iterable[FuzzCase]) -> List
 
 def fuzz_manifest(text: str, include_unexported: bool = False,
                   min_severity: str = "info") -> Dict:
-    """End-to-end: enumerate -> mutate -> detect. Returns a result dict."""
-    threshold = SEVERITY_ORDER.get(min_severity, 0)
+    """End-to-end: enumerate -> mutate -> detect. Returns a result dict.
+
+    Raises ValueError for empty/invalid input or an unknown min_severity.
+    """
+    if min_severity not in SEVERITY_ORDER:
+        valid = ", ".join(SEVERITY_ORDER)
+        raise ValueError(
+            f"unknown severity {min_severity!r}; choose one of: {valid}"
+        )
+    threshold = SEVERITY_ORDER[min_severity]
     entries = enumerate_entry_points(text, include_unexported=include_unexported)
     all_findings: List[Finding] = []
     total_cases = 0
@@ -328,7 +352,9 @@ def fuzz_manifest(text: str, include_unexported: bool = False,
         for f in detect_vulnerabilities(entry, cases):
             if SEVERITY_ORDER[f.severity] >= threshold:
                 all_findings.append(f)
-    all_findings.sort(key=lambda f: (-SEVERITY_ORDER[f.severity], f.component, f.category))
+    all_findings.sort(
+        key=lambda f: (-SEVERITY_ORDER.get(f.severity, 0), f.component, f.category)
+    )
     sev_counts: Dict[str, int] = {}
     for f in all_findings:
         sev_counts[f.severity] = sev_counts.get(f.severity, 0) + 1

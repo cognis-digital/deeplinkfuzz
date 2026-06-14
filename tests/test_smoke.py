@@ -132,3 +132,89 @@ def test_module_entrypoint_version():
     )
     assert proc.returncode == 0
     assert "deeplinkfuzz" in proc.stdout
+
+
+# ---------------------------------------------------------------------------
+# Hardening tests: edge cases and error paths
+# ---------------------------------------------------------------------------
+
+def test_parse_manifest_empty_string():
+    """Empty input must raise ValueError, not crash."""
+    from deeplinkfuzz.core import parse_manifest
+    with pytest.raises(ValueError, match="empty"):
+        parse_manifest("")
+
+
+def test_parse_manifest_whitespace_only():
+    """Whitespace-only input must raise ValueError."""
+    from deeplinkfuzz.core import parse_manifest
+    with pytest.raises(ValueError, match="empty"):
+        parse_manifest("   \n\t  ")
+
+
+def test_parse_manifest_malformed_xml():
+    """Malformed XML must raise ValueError with a clear message."""
+    from deeplinkfuzz.core import parse_manifest
+    with pytest.raises(ValueError, match="invalid manifest XML"):
+        parse_manifest("<unclosed>")
+
+
+def test_fuzz_manifest_unknown_severity():
+    """fuzz_manifest raises ValueError for an unrecognised min_severity."""
+    with pytest.raises(ValueError, match="unknown severity"):
+        fuzz_manifest("<manifest/>", min_severity="catastrophic")
+
+
+def test_fuzz_manifest_empty_input():
+    """fuzz_manifest propagates the empty-input ValueError from parse_manifest."""
+    with pytest.raises(ValueError):
+        fuzz_manifest("")
+
+
+def test_fuzz_manifest_no_entry_points():
+    """A manifest with no exported components returns zero findings, not an error."""
+    xml = (
+        '<?xml version="1.0"?>'
+        '<manifest xmlns:android="http://schemas.android.com/apk/res/android">'
+        "<application/>"
+        "</manifest>"
+    )
+    result = fuzz_manifest(xml)
+    assert result["entry_point_count"] == 0
+    assert result["finding_count"] == 0
+    assert result["fuzz_cases"] == 0
+
+
+def test_cli_missing_file_exits_2(capsys):
+    """CLI returns exit code 2 and prints to stderr for a missing file."""
+    code = main(["fuzz", "/nonexistent/path/manifest.xml"])
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "error:" in err.lower()
+
+
+def test_cli_malformed_xml_exits_2(tmp_path, capsys):
+    """CLI returns exit code 2 and prints to stderr for malformed XML."""
+    bad = tmp_path / "bad.xml"
+    bad.write_text("<not-closed>", encoding="utf-8")
+    code = main(["fuzz", str(bad)])
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "error:" in err.lower()
+
+
+def test_cli_empty_xml_exits_2(tmp_path, capsys):
+    """CLI returns exit code 2 and prints to stderr for an empty file."""
+    empty = tmp_path / "empty.xml"
+    empty.write_text("", encoding="utf-8")
+    code = main(["fuzz", str(empty)])
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "error:" in err.lower()
+
+
+def test_mcp_server_importable():
+    """mcp_server must import without errors (broken import is a regression)."""
+    import importlib
+    mod = importlib.import_module("deeplinkfuzz.mcp_server")
+    assert callable(mod.serve)

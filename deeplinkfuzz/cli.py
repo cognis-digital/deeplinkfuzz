@@ -28,8 +28,11 @@ examples:
 def _read_input(path: str) -> str:
     if path == "-":
         return sys.stdin.read()
-    with open(path, "r", encoding="utf-8") as fh:
-        return fh.read()
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            return fh.read()
+    except UnicodeDecodeError as exc:
+        raise OSError(f"file is not valid UTF-8: {exc}") from exc
 
 
 def _print_table(result: dict) -> None:
@@ -97,7 +100,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         text = _read_input(args.manifest)
     except OSError as exc:
-        print(f"error: cannot read {args.manifest}: {exc}", file=sys.stderr)
+        print(f"error: cannot read {args.manifest!r}: {exc}", file=sys.stderr)
         return 2
 
     try:
@@ -108,6 +111,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
+        return 2
+    except Exception as exc:  # pragma: no cover
+        print(f"error: unexpected failure: {exc}", file=sys.stderr)
         return 2
 
     if args.format == "json":

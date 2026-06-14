@@ -1,6 +1,10 @@
-"""DEEPLINKFUZZ MCP server — exposes scan() as an MCP tool for Cognis.Studio."""
+"""DEEPLINKFUZZ MCP server — exposes fuzz_manifest() as an MCP tool."""
 from __future__ import annotations
-from deeplinkfuzz.core import scan, to_json
+
+import json
+
+from deeplinkfuzz.core import fuzz_manifest
+
 
 def serve() -> int:
     """Start an MCP stdio server. Requires the optional 'mcp' extra:
@@ -14,9 +18,16 @@ def serve() -> int:
     app = FastMCP("deeplinkfuzz")
 
     @app.tool()
-    def deeplinkfuzz_scan(target: str) -> str:
-        """Fuzzes Android/iOS deep links, intents, and custom URL schemes against an emulator/device to surface unvalidated-redirect, injection, and component-hijack bugs.. Returns JSON findings."""
-        return to_json(scan(target))
+    def deeplinkfuzz_scan(manifest_xml: str) -> str:
+        """Fuzz an Android manifest XML string for deep-link injection bugs.
+
+        Returns a JSON object with entry_points, findings, and severity counts.
+        """
+        try:
+            result = fuzz_manifest(manifest_xml)
+        except ValueError as exc:
+            return json.dumps({"error": str(exc)})
+        return json.dumps(result)
 
     app.run()
     return 0
