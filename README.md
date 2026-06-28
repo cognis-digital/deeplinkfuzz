@@ -42,6 +42,88 @@ deeplinkfuzz scan .            # → prioritized findings in seconds
 
 
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ deeplinkfuzz-emit --version
+deeplinkfuzz 0.1.0
+```
+
+```console
+$ deeplinkfuzz-emit --help
+usage: deeplinkfuzz [-h] [--version] [--format {table,json}] {fuzz} ...
+
+Enumerate deep links / intents from an Android manifest and replay mutated payloads to find injection bugs in exported entry points.
+
+positional arguments:
+  {fuzz}
+    fuzz                fuzz a manifest for deep-link injection bugs
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json}
+                        output format (default: table)
+
+examples:
+  # Fuzz a manifest and print a table of findings (exit 1 if any found)
+  deeplinkfuzz fuzz AndroidManifest.xml
+
+  # JSON for CI pipelines / piping into jq
+  deeplinkfuzz fuzz AndroidManifest.xml --format json | jq '.findings'
+
+  # Only fail the build on high/critical issues
+  deeplinkfuzz fuzz AndroidManifest.xml --min-severity high
+
+  # Include components that are not exported (audit mode)
+  deeplinkfuzz fuzz AndroidManifest.xml --include-unexported
+```
+
+> Blocks above are real `deeplinkfuzz` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"timestamp": "2023-02-15T14:30:00Z",
+"platform": "stix",
+"findings": [
+    {
+        "id": "1234567890abcdef",
+        "title": "Suspicious Network Traffic",
+        "description": "Unusual network traffic detected from IP 192.168.1.100",
+        "objects": [
+            {
+                "id": "object-1",
+                "type": "indicator",
+                "name": "Malicious IP Address",
+                "value": "192.168.1.100"
+            }
+        ]
+    },
+    {
+        "id": "2345678901cdefg",
+        "title": "Compromised User Account",
+        "description": "User account 'john.doe' has been compromised",
+        "objects": [
+            {
+                "id": "object-2",
+                "type": "indicator",
+                "name": "Compromised User Account",
+                "value": "john.doe"
+            }
+        ]
+    }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install** the CLI:

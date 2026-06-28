@@ -1,0 +1,28 @@
+$ deeplinkfuzz-emit --help
+
+usage: deeplinkfuzz [-h] [--version] [--format {table,json}] {fuzz} ...
+
+Enumerate deep links / intents from an Android manifest and replay mutated payloads to find injection bugs in exported entry points.
+
+positional arguments:
+  {fuzz}
+    fuzz                fuzz a manifest for deep-link injection bugs
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json}
+                        output format (default: table)
+
+examples:
+  # Fuzz a manifest and print a table of findings (exit 1 if any found)
+  deeplinkfuzz fuzz AndroidManifest.xml
+
+  # JSON for CI pipelines / piping into jq
+  deeplinkfuzz fuzz AndroidManifest.xml --format json | jq '.findings'
+
+  # Only fail the build on high/critical issues
+  deeplinkfuzz fuzz AndroidManifest.xml --min-severity high
+
+  # Include components that are not exported (audit mode)
+  deeplinkfuzz fuzz AndroidManifest.xml --include-unexported

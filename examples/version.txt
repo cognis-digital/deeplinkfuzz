@@ -1,0 +1,3 @@
+$ deeplinkfuzz-emit --version
+
+deeplinkfuzz 0.1.0
